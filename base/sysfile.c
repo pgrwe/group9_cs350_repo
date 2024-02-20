@@ -350,6 +350,25 @@ sys_mkdir(void)
 }
 
 int
+sys_mkdir2_sysCall(void) {
+  // we define mkdir2 here in "sysfile.c" because although it is a system call, it deals with FILES, not PROCESSES, so it does not go 
+  // in sysproc.c 
+
+  char *path1, *path2;
+  struct inode *ip1, *ip2; 
+
+  begin_op();
+  if (argstr(0, &path1) < 0 || argstr(1, &path2) < 0 || (ip1 = create(path1, T_DIR, 0, 0)) == 0 || (ip2 = create(path2, T_DIR, 0, 0)) == 0) {
+    end_op();
+    return -1;
+  }
+  iunlockput(ip1);
+  iunlockput(ip2);
+  end_op();
+  return 0;
+}
+
+int
 sys_mknod(void)
 {
   struct inode *ip;

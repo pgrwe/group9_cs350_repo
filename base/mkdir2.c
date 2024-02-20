@@ -10,7 +10,7 @@
 
 void mkdir2(char * d1, char* d2) {
 
-    mkdir2_xv6(d1, d2); // this is making the system call that will run the kernel function to make two directories, d1 and d2
+    mkdir2_sysCall(d1, d2); // this is making the system call that will run the kernel function to make two directories, d1 and d2
 
 }
 

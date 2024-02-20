@@ -99,18 +99,3 @@ sys_shutdown_xv6(void)
   return 0;
 }
 
-int
-sys_mkdir2_xv6(void) {
-  // this is the actual KERNEL function that is run after the mkdir2_xv6 system call! The system call jump table has a pointer to this function
-  
-  char *directoryName1; // these are "strings" that will hold the directory names from user space
-  char *directoryName2; 
-
-  if (argstr(0, &directoryName1) < 0 || argstr(1, &directoryName2) < 0) { // argstr takes two arguments: (<argIndex>, <placeToStore>)
-    return -1; // if any of the argstr returns <0, this means that something bad happened 
-  }
-  if (mkdir(directoryName1) < 0 || mkdir(directoryName2) < 0) { // mkdir takes one argument: the name of the directory which is a string
-    return -1;  // if it returns <0, something bad happened
-  }
-
-}
