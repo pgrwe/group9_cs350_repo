@@ -104,6 +104,7 @@ extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_shutdown_xv6(void);
+extern int sys_mkdir2_xv6(void); // we are now declaring such a KERNEL function exists
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -128,6 +129,7 @@ static int (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_shutdown_xv6] sys_shutdown_xv6,
+[SYS_mkdir2_xv6] sys_mkdir2_xv6, // here, "sys_mkdir2_xv6" is the pointer to the actual KERNEL function that will make the directories
 };
 
 void

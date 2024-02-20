@@ -7,10 +7,13 @@
    REMEMBER to disable the stub functions (by commenting the following macro) to 
    allow your implementation to work properly. */
 
-#define STUB_FUNCS
-#ifdef STUB_FUNCS
-void mkdir2(char * d1, char* d2) {}
-#endif
+
+void mkdir2(char * d1, char* d2) {
+
+    mkdir2_xv6(d1, d2); // this is making the system call that will run the kernel function to make two directories, d1 and d2
+
+}
+
 
 
 /* IMPORTANT INSTRUCTION: the code below should not be changed. 
@@ -24,6 +27,7 @@ main(int argc, char * argv[])
         printf(1, "Please provid the names of two directories to create");
     }
 
-	mkdir2(argv[1], argv[2]);
+	mkdir2(argv[1], argv[2]); // this entire file is a program (mkdir2.c will become an executable) that can take two args
+                                // and create two new directories. The user will essentially run this program as a process
     exit(); //return 0;
 }
