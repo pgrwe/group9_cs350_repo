@@ -25,6 +25,7 @@ int sleep(int);
 int uptime(void);
 int shutdown_xv6(void);
 int mkdir2_sysCall(char *d1, char*d2); // this is the essentially the system call that the user calls from userspace in "mkdir2.c"
+int exit2_proc(int);
 
 // ulib.c
 int stat(char*, struct stat*);

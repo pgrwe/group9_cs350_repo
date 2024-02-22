@@ -99,3 +99,15 @@ sys_shutdown_xv6(void)
   return 0;
 }
 
+int
+sys_exit2_proc(void)
+{
+  int n;
+  if(argint(0, &n) < 0)
+    return -1;
+  cprintf("Exit status: %d\n", n);
+  exit();
+  return 0;  // not reached
+}
+
+

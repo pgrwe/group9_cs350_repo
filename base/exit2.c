@@ -9,7 +9,9 @@
 
 #define STUB_FUNCS
 #ifdef STUB_FUNCS
-void exit2(int status) {}
+void exit2(int status) {
+    exit2_proc(status);
+}
 #endif
 
 

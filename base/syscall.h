@@ -22,3 +22,4 @@
 #define SYS_close  21
 #define SYS_shutdown_xv6 22
 #define SYS_mkdir2_sysCall 23 // here, we are giving mkdir2_xv6 system call the number 23 which is used to index into system call jump table
+#define SYS_exit2_proc 24
