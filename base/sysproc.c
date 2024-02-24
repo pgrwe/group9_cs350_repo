@@ -111,9 +111,10 @@ sys_exit2_proc(void)
 }
 
 int
-sys_miniFloatAdder_sysCall(void) {
-  int num1, num2;
-  if (argstr(0, &num1) < 0 || argstr(1, &num2) < 0) { // trying to save the arguments to num1 and num2 respectively
+sys_miniIntAdder_sysCall(void) {
+  int num1 = 0;
+  int num2;
+  if (argint(0, &num1) < 0 || argint(1, &num2) < 0) { // trying to save the arguments to num1 and num2 respectively
     return -1; // if the getting of the arguments failed, return -1
   }
   cprintf("The sum of the two numbers is: %d\n", num1+num2);
