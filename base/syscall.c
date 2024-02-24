@@ -107,6 +107,7 @@ extern int sys_shutdown_xv6(void);
 extern int sys_mkdir2_sysCall(void); // we are now declaring such a KERNEL function exists
 extern int sys_exit2_proc(void);
 extern int sys_miniIntAdder_sysCall(void); // we are now delcaring such a KERNEL function exists
+extern int sys_uptime2_sysCall(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -134,6 +135,7 @@ static int (*syscalls[])(void) = {
 [SYS_mkdir2_sysCall] sys_mkdir2_sysCall, // here, "sys_mkdir2_xv6" is the pointer to the actual KERNEL function that will make the directories
 [SYS_exit2_proc] sys_exit2_proc,
 [SYS_miniIntAdder_sysCall] sys_miniIntAdder_sysCall, // here, "miniIntAdder_sysCall" is the pointer to the actual KERNEL function of the system call
+[SYS_uptime2_sysCall] sys_uptime2_sysCall,
 };
 
 void
