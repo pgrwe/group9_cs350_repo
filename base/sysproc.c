@@ -112,7 +112,7 @@ sys_exit2_proc(void)
 
 int
 sys_miniIntAdder_sysCall(void) {
-  int num1 = 0;
+  int num1;
   int num2;
   if (argint(0, &num1) < 0 || argint(1, &num2) < 0) { // trying to save the arguments to num1 and num2 respectively
     return -1; // if the getting of the arguments failed, return -1
