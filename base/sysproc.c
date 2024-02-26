@@ -100,8 +100,11 @@ sys_shutdown_xv6(void)
 }
 
 int
-sys_shutdown2_xv6(char * msg)
+sys_shutdown2_xv6(void)
 {
+  char *msg;
+  if(argstr(0, &msg) < 0)
+    return -1;
   cprintf("%s\n", msg);
   outw(0xB004, 0x0|0x2000);
   outw(0x604, 0x0|0x2000);

@@ -108,7 +108,7 @@ extern int sys_mkdir2_sysCall(void); // we are now declaring such a KERNEL funct
 extern int sys_exit2_proc(void);
 extern int sys_miniIntAdder_sysCall(void); // we are now delcaring such a KERNEL function exists
 extern int sys_uptime2_sysCall(void);
-extern int sys_shutdown2_xv6(char * msg);
+extern int sys_shutdown2_xv6(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
