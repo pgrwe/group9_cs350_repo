@@ -2,6 +2,12 @@
 #include "stat.h"
 #include "user.h"
 
+void miniIntAdder(int num1, int *num2) 
+{
+    miniIntAdder_sysCall(num1, num2); // make the system call by invoking the user space wrapper function of the system call
+}
+
+
 int main (int argc, char *argv[]) {
     // this is a typical user mode function that's going to call the user space wrapper function
     int num1 = atoi(argv[1]);
@@ -23,6 +29,6 @@ int main (int argc, char *argv[]) {
     //     return -1;
     // }
 
-    miniIntAdder_sysCall(num1, num2); // make the system call by invoking the user space wrapper function of the system call
+    miniIntAdder(num1, num2); // make the system call by invoking the user space wrapper function of the system call
 
 }

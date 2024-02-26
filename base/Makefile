@@ -182,7 +182,7 @@ UPROGS=\
 	_uptime2 \
 	_mkdir2 \
 	_exit2 \
-# 	_miniIntAdder \
+	_miniIntAdder \
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
