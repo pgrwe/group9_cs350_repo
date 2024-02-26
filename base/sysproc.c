@@ -100,6 +100,15 @@ sys_shutdown_xv6(void)
 }
 
 int
+sys_shutdown2_xv6(char * msg)
+{
+  cprintf("%s\n", msg);
+  outw(0xB004, 0x0|0x2000);
+  outw(0x604, 0x0|0x2000);
+  return 0;
+}
+
+int
 sys_exit2_proc(void)
 {
   int n;

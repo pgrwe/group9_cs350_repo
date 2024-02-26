@@ -24,6 +24,7 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int shutdown_xv6(void);
+int shutdown2_xv6(char * msg);
 int mkdir2_sysCall(char *d1, char*d2); // this is the essentially the system call that the user calls from userspace in "mkdir2.c"
 int exit2_proc(int);
 int miniIntAdder_sysCall(int i1, int i2); // we declare the system call's user space wrapper function here

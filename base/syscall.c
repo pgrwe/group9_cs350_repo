@@ -108,6 +108,7 @@ extern int sys_mkdir2_sysCall(void); // we are now declaring such a KERNEL funct
 extern int sys_exit2_proc(void);
 extern int sys_miniIntAdder_sysCall(void); // we are now delcaring such a KERNEL function exists
 extern int sys_uptime2_sysCall(void);
+extern int sys_shutdown2_xv6(char * msg);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -136,6 +137,7 @@ static int (*syscalls[])(void) = {
 [SYS_exit2_proc] sys_exit2_proc,
 [SYS_miniIntAdder_sysCall] sys_miniIntAdder_sysCall, // here, "miniIntAdder_sysCall" is the pointer to the actual KERNEL function of the system call
 [SYS_uptime2_sysCall] sys_uptime2_sysCall,
+[SYS_shutdown2_xv6] sys_shutdown2_xv6,
 };
 
 void

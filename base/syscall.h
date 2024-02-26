@@ -25,3 +25,4 @@
 #define SYS_exit2_proc 24
 #define SYS_miniIntAdder_sysCall 25 // here, we are giving the miniIntAdder_sysCall system call the number 25
 #define SYS_uptime2_sysCall 26
+#define SYS_shutdown2_xv6 27
