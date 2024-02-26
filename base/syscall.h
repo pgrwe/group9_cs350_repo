@@ -24,3 +24,5 @@
 #define SYS_mkdir2_sysCall 23 // here, we are giving mkdir2_xv6 system call the number 23 which is used to index into system call jump table
 #define SYS_exit2_proc 24
 #define SYS_miniIntAdder_sysCall 25 // here, we are giving the miniIntAdder_sysCall system call the number 25
+#define SYS_uptime2_sysCall 26
+#define SYS_shutdown2_xv6 27

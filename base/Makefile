@@ -27,6 +27,7 @@ OBJS = \
 	uart.o\
 	vectors.o\
 	vm.o\
+# 	miniIntAdder.o \
 
 # Cross-compiling (e.g., on Mac OS X)
 # TOOLPREFIX = i386-jos-elf
@@ -181,7 +182,7 @@ UPROGS=\
 	_uptime2 \
 	_mkdir2 \
 	_exit2 \
-	_miniIntAdder \
+# 	_miniIntAdder \
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)

@@ -100,6 +100,15 @@ sys_shutdown_xv6(void)
 }
 
 int
+sys_shutdown2_xv6(char * msg)
+{
+  cprintf("%s\n", msg);
+  outw(0xB004, 0x0|0x2000);
+  outw(0x604, 0x0|0x2000);
+  return 0;
+}
+
+int
 sys_exit2_proc(void)
 {
   int n;
@@ -121,4 +130,24 @@ sys_miniIntAdder_sysCall(void) {
   return 0;
 }
 
+sys_uptime2_sysCall(void)
+{
+  int n;
+  uint xticks;
 
+  if (argint(0, &n) < 0)
+    return -1;
+  acquire(&tickslock);
+  xticks = ticks;
+  release(&tickslock);
+
+  if(n == 1){
+    return xticks;
+  } else if(n == 2){
+    return xticks / 100;
+  } else if(n == 3){
+    return xticks / 100 / 60;
+  } else {
+    return -1;
+  }
+}
