@@ -52,7 +52,17 @@ main(int argc, char *argv[])
     for (i = 0; i < TOTAL_TEST_TRIALS; i++)
     {
         printf(1, "\nTrial %d: ", i);
-        ret = fork();
+        ret = fork(); 
+        /* 
+        
+            1. At this point, what happens? fork() is called and the core logic code for fork() in "proc.c" is run. 
+            2. The child process, "np", is created as an essentially identical copy of the parent process, "curproc". 
+            3. When the child process, "np", is done being created and set to RUNNABLE, it will be at this position, ready to execute the
+            "if (ret < 0)" statement right after. The parent process, "curpoc" is also ready to execute. Both have their appropriate
+            return values saved in ret (0 for child, positive integer for parent)
+            4. The scheduler decides which one will execute the rest of the code first 
+            
+        */
         if (ret < 0)
         {
             printf(1, "fork() failed (%d)\n", ret);

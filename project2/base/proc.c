@@ -182,16 +182,17 @@ growproc(int n)
 int
 fork(void)
 {
+  // this is the core logic for the "fork" kernel function. This logic is performed by the PARENT process and does the forking
   int i, pid;
-  struct proc *np;
-  struct proc *curproc = myproc();
+  struct proc *np; // child process (new process)
+  struct proc *curproc = myproc(); // parent process
 
   // Allocate process.
   if((np = allocproc()) == 0){
     return -1;
   }
 
-  // Copy process state from proc.
+  // Copy process state from proc (i.e. parent process)
   if((np->pgdir = copyuvm(curproc->pgdir, curproc->sz)) == 0){
     kfree(np->kstack);
     np->kstack = 0;
@@ -203,20 +204,31 @@ fork(void)
   *np->tf = *curproc->tf;
 
   // Clear %eax so that fork returns 0 in the child.
-  np->tf->eax = 0;
+  np->tf->eax = 0; // RECALL: %eax is the return value of a function. Essentially, by doing %eax=0, we are causing the child process'
+              // return value to be 0 so that when fork() returns to the child, the return value is 0 
+              // Notice we don't change proc->tf->eax. We don't want to change the return value of the parent! 
 
-  for(i = 0; i < NOFILE; i++)
+  for(i = 0; i < NOFILE; i++) // copy all of the parent's open file descriptors to child
     if(curproc->ofile[i])
       np->ofile[i] = filedup(curproc->ofile[i]);
   np->cwd = idup(curproc->cwd);
 
-  safestrcpy(np->name, curproc->name, sizeof(curproc->name));
+  safestrcpy(np->name, curproc->name, sizeof(curproc->name)); // copies parent process name to the child
 
   pid = np->pid;
 
-  acquire(&ptable.lock);
-  np->state = RUNNABLE;
-  release(&ptable.lock);
+  // the process table (ptable) contains information about all the processes in the system
+  acquire(&ptable.lock);  // lock the ptable so that nobody else can access it while we are marking this child process
+  np->state = RUNNABLE; // here, we are marking the child process as RUNNABLE, meaning it is ready to be scheduled by the CPU scheduler
+                        // whichever process runs is now dependent on the scheduler, as both processes are done and ready
+                        // to execute their code
+  release(&ptable.lock); // unlock the ptable 
+
+
+  // at this point, the parent process is still running this fork() core logic code. So we can make the parent yield to the child before
+  // the parent returns  
+
+  if (winner == 1) yield(); 
 
   return pid;
 }
