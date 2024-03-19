@@ -5,11 +5,13 @@
    stub functions for the system call user space wrapper functions are provided. 
    REMEMBER to disable the stub functions (by commenting the following macro) to 
    allow your implementation to work properly. */
-#define STUB_FUNCS
-#ifdef STUB_FUNCS
-void fork_winner(int winner) {}
+
+void fork_winner(int winner) {
+    fork_winner_syscall(winner);   // call the user space wrapper routine function for the system call, passing in the value of "winner"
+
+}
 void set_sched(int scheduler) {}
-#endif
+
 
 /* IMPORTANT INSTRUCTION: the test code below should not be changed. 
    Failure to follow this instruction will lead to zero point for this part */

@@ -22,3 +22,4 @@
 #define SYS_close  21
 #define SYS_shutdown     22
 #define SYS_enable_sched_trace  23
+#define SYS_fork_winner_syscall  24 // our new system call's call number, 24

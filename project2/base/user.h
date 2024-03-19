@@ -3,6 +3,7 @@ struct rtcdate;
 
 // system calls
 int fork(void);
+void fork_winner_syscall(int); // our new system call's user space wrapper function 
 int exit(void) __attribute__((noreturn));
 int wait(void);
 int pipe(int*);

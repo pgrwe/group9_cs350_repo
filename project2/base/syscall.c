@@ -88,6 +88,7 @@ extern int sys_dup(void);
 extern int sys_exec(void);
 extern int sys_exit(void);
 extern int sys_fork(void);
+extern int sys_fork_winner_syscall(void); // prototype/declaration for our new system call's kernel function/code
 extern int sys_fstat(void);
 extern int sys_getpid(void);
 extern int sys_kill(void);
@@ -130,6 +131,7 @@ static int (*syscalls[])(void) = {
 [SYS_close]   sys_close,
 [SYS_shutdown]      sys_shutdown,
 [SYS_enable_sched_trace]   sys_enable_sched_trace,
+[SYS_fork_winner_syscall]   sys_fork_winner_syscall, // the pointer to our new system call's kernel function/code
 };
 
 void
