@@ -17,11 +17,12 @@ int
 sys_fork_winner_syscall(void) 
 {
   // this is the kernel code/function for our new system call, fork_winner
-  int winner = 0; // we are now INITIALIZING the "extern int winner" global variable in proc.h
-  if (argint(0, &winner) < 0) {
+  int value = 0; // we are now INITIALIZING the "extern int winner" global variable in proc.h
+  if (argint(0, &value) < 0) {
     return -1; // if there's something wrong with our retrieval of the argument passed in to the user space wrapper routine, exit
   }
   // if no error....
+  winner = value;
   return 0;
 }
 

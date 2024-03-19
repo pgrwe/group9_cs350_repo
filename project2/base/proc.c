@@ -7,6 +7,8 @@
 #include "proc.h"
 #include "spinlock.h"
 
+int winner = 0;
+
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
@@ -225,10 +227,10 @@ fork(void)
   release(&ptable.lock); // unlock the ptable 
 
 
-  // at this point, the parent process is still running this fork() core logic code. So we can make the parent yield to the child before
+  // at this point, the parent process is STILL running this fork() core logic code. So we can make the parent yield to the child before
   // the parent returns  
 
-  if (winner == 1) yield(); 
+  if (winner == 1) yield(); // if winner = 1, we want the child to go first, so the parent must now yield 
 
   return pid;
 }
