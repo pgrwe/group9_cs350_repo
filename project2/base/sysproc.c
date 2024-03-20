@@ -17,7 +17,7 @@ int
 sys_fork_winner_syscall(void) 
 {
   // this is the kernel code/function for our new system call, fork_winner
-  int value = 0; // we are now INITIALIZING the "extern int winner" global variable in proc.h
+  int value = 0; 
   if (argint(0, &value) < 0) {
     return -1; // if there's something wrong with our retrieval of the argument passed in to the user space wrapper routine, exit
   }
@@ -134,4 +134,15 @@ int sys_tickets_owned_syscall(void)
     return -1;
   }
   return tickets_owned(pid); // this will call the actual core logic function in proc.c to handle this operation
+}
+
+int sys_set_sched_syscall(void) {
+  // this is the actual kernel function of the set_sched_syscall system call
+  int userChoice = 0; // this variable will hold what the user passed in to this system call's user space wrapper function
+  if (argint(0, &userChoice) < 0) {
+    return -1; // if we have some error while obtaining the value the user passed in from the user space wrapper func, return -1
+  }
+  // if no error
+  schedPolicy = userChoice; // we initialize the global variable in proc.h that's going to be used to determine the scheduler 
+  return 0;
 }

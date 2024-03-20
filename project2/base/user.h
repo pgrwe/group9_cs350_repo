@@ -25,6 +25,7 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int tickets_owned_syscall(int);
+void set_sched_syscall(int);
 
 // ulib.c
 int stat(char*, struct stat*);

@@ -10,6 +10,7 @@
 
 
 int winner = 0;
+int schedPolicy = 0;
 
 struct {
   struct spinlock lock;

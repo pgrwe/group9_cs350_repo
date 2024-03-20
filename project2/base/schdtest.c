@@ -6,7 +6,9 @@
    REMEMBER to disable the stub functions (by commenting the following macro) to 
    allow your implementation to work properly. */
 
-void set_sched(int scheduler) {}
+void set_sched(int scheduler) {
+    set_sched_syscall(scheduler); // we are calling the user space wrapper function of the system call and passing in our scheduling choice
+}
 int tickets_owned(int pid) {
     return tickets_owned_syscall(pid);    
 }

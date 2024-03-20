@@ -14,6 +14,7 @@ extern struct cpu cpus[NCPU];
 extern int ncpu;
 extern int winner; // this is a global variable used to store the "winner" for fork_winner system call. It is an "extern", so it will
                 // not be initialized and no memory is set aside for it right now until another file that #include proc.h initializes it 
+extern int schedPolicy; // this is a global variable to store the "schedPolicy" for the set_sched_syscall system call. 
 
 //PAGEBREAK: 17
 // Saved registers for kernel context switches.
