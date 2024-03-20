@@ -5,12 +5,13 @@
    stub functions for the system call user space wrapper functions are provided. 
    REMEMBER to disable the stub functions (by commenting the following macro) to 
    allow your implementation to work properly. */
-#define STUB_FUNCS
-#ifdef STUB_FUNCS
+
 void set_sched(int scheduler) {}
-int tickets_owned(int pid) {return 0;}
+int tickets_owned(int pid) {
+    return tickets_owned_syscall(pid);    
+}
 int transfer_tickets(int pid, int tickets) {return 0;}
-#endif
+
 
 /* IMPORTANT INSTRUCTION: the test code below should not be changed. 
    Failure to follow this instruction will lead to zero point for this part */

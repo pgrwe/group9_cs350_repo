@@ -106,7 +106,7 @@ extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_shutdown(void);
 extern int sys_enable_sched_trace(void);
-extern int sys_tickets_owned(void);
+extern int sys_tickets_owned_syscall(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -133,7 +133,7 @@ static int (*syscalls[])(void) = {
 [SYS_shutdown]      sys_shutdown,
 [SYS_enable_sched_trace]   sys_enable_sched_trace,
 [SYS_fork_winner_syscall]   sys_fork_winner_syscall, // the pointer to our new system call's kernel function/code
-[SYS_tickets_owned]   sys_tickets_owned, 
+[SYS_tickets_owned_syscall]      sys_tickets_owned_syscall,
 };
 
 void

@@ -24,7 +24,7 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
-int tickets_owned(int);
+int tickets_owned_syscall(int);
 
 // ulib.c
 int stat(char*, struct stat*);
