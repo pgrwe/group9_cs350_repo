@@ -125,3 +125,13 @@ int sys_enable_sched_trace(void)
 
   return 0;
 }
+
+int sys_tickets_owned(void)
+{
+  int pid; //Store the PID argument that is passed to the sys call
+  if(argint(0, &pid) < 0) //Read the first arg passed to the syscall. This will be the PID of the process whose PID we are looking for. If we don't find it, return -1 as an error.
+  {
+    return -1;
+  }
+  return tickets_owned(pid);
+}

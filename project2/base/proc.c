@@ -7,6 +7,8 @@
 #include "proc.h"
 #include "spinlock.h"
 
+
+
 int winner = 0;
 
 struct {
@@ -23,6 +25,22 @@ extern void forkret(void);
 extern void trapret(void);
 
 static void wakeup1(void *chan);
+
+int tickets_owned(int pid)
+{
+  struct proc *p;
+  acquire(&ptable.lock); //This line prevents race conditions when accessing/modifying our process table.
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) //Here, we iterate over all the processes in the process table. ptable.proc is the start of the array, and NPROC is the MAX number of processes in the system
+  {
+    if(p->pid == pid) //Check if current process has the PID we are looking for
+    {
+      release(&ptable.lock);
+      return p->tickets; //Return number of tickets
+    }
+  }
+  release(&ptable.lock);
+  return -1; //If PID is not found, return -1
+}
 
 void
 pinit(void)
