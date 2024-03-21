@@ -8,14 +8,56 @@
 #include "spinlock.h"
 
 
-
-int winner = 0;
-int schedPolicy = 0;
+#define STRIDE_TOTAL_TICKETS 100
 
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
 } ptable;
+
+
+void stride_scheduling_policy(void)
+{
+  struct proc *p;
+  int n = 0;
+  int ticket_p = 0;
+
+//First we count the ACTIVE processes
+  //acquire(&ptable.lock);
+  //Reasoning behind acquire and release: These methods ensure EXCLUSIVE access to the process table. Essentially, they prevent race conditions, which is good for synchronization.
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  //Loop through running processes
+  {
+    //If the process state is running or runnable, increment our process counter n
+    if(p->state == RUNNABLE || p->state ==RUNNING)
+    {
+      n++;
+    }
+  }
+
+  if(n != 0) 
+  {
+  ticket_p = STRIDE_TOTAL_TICKETS / n; //Here we calculate the tickets per process. Of course, we make sure that n is not 0 b/c we don't want to divide by 0.
+  }
+
+  //Now we destribute tickets and recalc stride for each of our active processes.
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  {
+    if(p->state == RUNNABLE || p->state ==RUNNING)
+    {
+      p->tickets = ticket_p;
+      p->pass = 0; //Reset the pass value
+      p->stride = (STRIDE_TOTAL_TICKETS * 10) / p->tickets; //Recalculate stride
+    }
+  }
+
+ // release(&ptable.lock);
+
+}
+
+int winner = 0;
+int schedPolicy = 0;
+
 
 static struct proc *initproc;
 
@@ -242,7 +284,7 @@ fork(void)
   acquire(&ptable.lock);  // lock the ptable so that nobody else can access it while we are marking this child process
   np->state = RUNNABLE; // here, we are marking the child process as RUNNABLE, meaning it is ready to be scheduled by the CPU scheduler
                         // whichever process runs is now dependent on the scheduler, as both processes are done and ready
-                        // to execute their code
+  stride_scheduling_policy();                      // to execute their code
   release(&ptable.lock); // unlock the ptable 
 
 
@@ -252,8 +294,7 @@ fork(void)
   if (winner == 1) yield(); // if winner = 1, we want the child to go first, so the parent must now yield 
 
   return pid;
-}
-
+} //this is my fork function where would I put it
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
 // until its parent calls wait() to find out it exited.
@@ -294,6 +335,7 @@ exit(void)
     }
   }
 
+  stride_scheduling_policy(); 
   // Jump into the scheduler, never to return.
   curproc->state = ZOMBIE;
   sched();
@@ -352,6 +394,7 @@ wait(void)
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
+
 void
 scheduler(void)
 {
@@ -360,7 +403,6 @@ scheduler(void)
   c->proc = 0;
   
   int ran = 0; // CS 350/550: to solve the 100%-CPU-utilization-when-idling problem
-
   for(;;){
     // Enable interrupts on this processor.
     sti();
@@ -368,11 +410,23 @@ scheduler(void)
         // Loop over process table looking for process to run.
         acquire(&ptable.lock);
         ran = 0;
+        struct proc *new_proc;
+        int min_proc_value = 1000;
         for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
           if(p->state != RUNNABLE)
             continue;
 
-          ran = 1;
+          if(p->pass < min_proc_value)
+          {
+            new_proc = p;
+            min_proc_value = p->pass;
+          }
+        }
+        if(new_proc)
+        {
+        p = new_proc; // Here we set p to the process with the lowest value
+        p->pass += p->stride; //add process's stride to pass
+        ran = 1;
       
           // Switch to chosen process.  It is the process's job
           // to release ptable.lock and then reacquire it
@@ -395,6 +449,8 @@ scheduler(void)
     }
   }
 }
+
+
 
 // Enter scheduler.  Must hold only ptable.lock
 // and have changed proc->state. Saves and restores
@@ -494,6 +550,7 @@ sleep(void *chan, struct spinlock *lk)
   // Go to sleep.
   p->chan = chan;
   p->state = SLEEPING;
+  //stride_scheduling_policy();
 
   sched();
 
@@ -514,11 +571,22 @@ static void
 wakeup1(void *chan)
 {
   struct proc *p;
+  //int call_stride = 0;
 
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  {
     if(p->state == SLEEPING && p->chan == chan)
+    {
       p->state = RUNNABLE;
+     // call_stride = 1;
+    }
+   /// if(call_stride == 1)
+   // {
+   // stride_scheduling_policy();
+   // }
+  }
 }
+
 
 // Wake up all processes sleeping on chan.
 void
