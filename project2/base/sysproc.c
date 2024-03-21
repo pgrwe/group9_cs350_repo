@@ -136,6 +136,20 @@ int sys_tickets_owned_syscall(void)
   return tickets_owned(pid); // this will call the actual core logic function in proc.c to handle this operation
 }
 
+int sys_transfer_tickets_syscall(void)
+{
+   int pid, tickets;
+   if (argint(0, &pid) < 0) 
+   {
+       return -1;
+   }
+   if (argint(1, &tickets) < 0) 
+   {
+       return -1;
+   }
+   return transfer_tickets(pid, tickets);
+}
+
 int sys_set_sched_syscall(void) {
   // this is the actual kernel function of the set_sched_syscall system call
   int userChoice = 0; // this variable will hold what the user passed in to this system call's user space wrapper function

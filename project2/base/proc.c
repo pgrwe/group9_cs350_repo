@@ -85,6 +85,45 @@ int tickets_owned(int pid)
   return -1; //If PID is not found, return -1
 }
 
+int transfer_tickets(int pid, int tickets)
+{
+    struct proc *p;
+    struct proc *current_p = myproc();
+    /* acquire(&ptable.lock); */
+ 
+    // check for negative tickets
+    if (tickets < 0 )
+    { 
+        /* release(&ptable.lock); */
+        return -1; 
+    }
+    // too many tickets to transfer
+    if(p->tickets - 1 > tickets)
+    {    
+        /* release(&ptable.lock); */
+        return -2;
+    }
+
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) 
+    {
+        if (p->state == RUNNING || p->state == RUNNABLE)
+        {
+            if(p->pid == pid) 
+            {
+            current_p->tickets -= tickets;
+            /* p->tickets += tickets; */
+            current_p->stride = (STRIDE_TOTAL_TICKETS * 10)/current_p->tickets;
+            /* p->stride = (STRIDE_TOTAL_TICKETS * 10)/p->tickets; */
+            return current_p->tickets;
+            }
+        }
+    }
+    // pid not found
+    /* release(&ptable.lock); */
+    return -3; 
+}
+
+
 void
 pinit(void)
 {

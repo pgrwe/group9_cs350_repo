@@ -25,3 +25,4 @@
 #define SYS_fork_winner_syscall  24 // our new system call's call number, 24
 #define SYS_tickets_owned_syscall  25
 #define SYS_set_sched_syscall   26
+#define SYS_transfer_tickets_syscall 27

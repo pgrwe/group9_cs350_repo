@@ -26,6 +26,7 @@ int sleep(int);
 int uptime(void);
 int tickets_owned_syscall(int);
 void set_sched_syscall(int);
+int transfer_tickets_syscall(int pid, int tickets);
 
 // ulib.c
 int stat(char*, struct stat*);
