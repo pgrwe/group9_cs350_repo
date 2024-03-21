@@ -89,18 +89,18 @@ int transfer_tickets(int pid, int tickets)
 {
     struct proc *p;
     struct proc *current_p = myproc();
-    /* acquire(&ptable.lock); */
+    acquire(&ptable.lock);
  
     // check for negative tickets
     if (tickets < 0 )
     { 
-        /* release(&ptable.lock); */
+        release(&ptable.lock);
         return -1; 
     }
     // too many tickets to transfer
     if(p->tickets - 1 > tickets)
     {    
-        /* release(&ptable.lock); */
+        release(&ptable.lock);
         return -2;
     }
 
@@ -111,15 +111,16 @@ int transfer_tickets(int pid, int tickets)
             if(p->pid == pid) 
             {
             current_p->tickets -= tickets;
-            /* p->tickets += tickets; */
+            p->tickets += tickets;
             current_p->stride = (STRIDE_TOTAL_TICKETS * 10)/current_p->tickets;
-            /* p->stride = (STRIDE_TOTAL_TICKETS * 10)/p->tickets; */
+            p->stride = (STRIDE_TOTAL_TICKETS * 10)/p->tickets;
+            release(&ptable.lock);
             return current_p->tickets;
             }
         }
     }
     // pid not found
-    /* release(&ptable.lock); */
+    release(&ptable.lock);
     return -3; 
 }
 
