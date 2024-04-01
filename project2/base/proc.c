@@ -91,6 +91,7 @@ int transfer_tickets(int pid, int tickets)
     struct proc *current_p = myproc();
     acquire(&ptable.lock);
  
+    if (current_p == 0) return -4;
     // check for negative tickets
     if (tickets < 0 )
     { 
@@ -98,7 +99,7 @@ int transfer_tickets(int pid, int tickets)
         return -1; 
     }
     // too many tickets to transfer
-    if(p->tickets - 1 > tickets)
+    if((current_p->tickets - 1) < tickets)
     {    
         release(&ptable.lock);
         return -2;
