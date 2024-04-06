@@ -11,41 +11,16 @@ Disassembly of section .text:
 8010000b:	e4                   	.byte 0xe4
 
 8010000c <entry>:
-
-# Entering xv6 on boot processor, with paging off.
-.globl entry
-entry:
-  # Turn on page size extension for 4Mbyte pages
-  movl    %cr4, %eax
 8010000c:	0f 20 e0             	mov    %cr4,%eax
-  orl     $(CR4_PSE), %eax
 8010000f:	83 c8 10             	or     $0x10,%eax
-  movl    %eax, %cr4
 80100012:	0f 22 e0             	mov    %eax,%cr4
-  # Set page directory
-  movl    $(V2P_WO(entrypgdir)), %eax
 80100015:	b8 00 80 10 00       	mov    $0x108000,%eax
-  movl    %eax, %cr3
 8010001a:	0f 22 d8             	mov    %eax,%cr3
-  # Turn on paging.
-  movl    %cr0, %eax
 8010001d:	0f 20 c0             	mov    %cr0,%eax
-  orl     $(CR0_PG|CR0_WP), %eax
 80100020:	0d 00 00 01 80       	or     $0x80010000,%eax
-  movl    %eax, %cr0
 80100025:	0f 22 c0             	mov    %eax,%cr0
-
-  # Set up the stack pointer.
-  movl $(stack + KSTACKSIZE), %esp
 80100028:	bc b0 ff 11 80       	mov    $0x8011ffb0,%esp
-
-  # Jump to main(), and switch to executing at
-  # high addresses. The indirect call is needed because
-  # the assembler produces a PC-relative instruction
-  # for a direct jump.
-  mov $main, %eax
 8010002d:	b8 10 30 10 80       	mov    $0x80103010,%eax
-  jmp *%eax
 80100032:	ff e0                	jmp    *%eax
 80100034:	66 90                	xchg   %ax,%ax
 80100036:	66 90                	xchg   %ax,%ax
@@ -9274,42 +9249,18 @@ strlen(const char *s)
 8010495a:	c3                   	ret
 
 8010495b <swtch>:
-# a struct context, and save its address in *old.
-# Switch stacks to new and pop previously-saved registers.
-
-.globl swtch
-swtch:
-  movl 4(%esp), %eax
 8010495b:	8b 44 24 04          	mov    0x4(%esp),%eax
-  movl 8(%esp), %edx
 8010495f:	8b 54 24 08          	mov    0x8(%esp),%edx
-
-  # Save old callee-save registers
-  pushl %ebp
 80104963:	55                   	push   %ebp
-  pushl %ebx
 80104964:	53                   	push   %ebx
-  pushl %esi
 80104965:	56                   	push   %esi
-  pushl %edi
 80104966:	57                   	push   %edi
-
-  # Switch stacks
-  movl %esp, (%eax)
 80104967:	89 20                	mov    %esp,(%eax)
-  movl %edx, %esp
 80104969:	89 d4                	mov    %edx,%esp
-
-  # Load new callee-save registers
-  popl %edi
 8010496b:	5f                   	pop    %edi
-  popl %esi
 8010496c:	5e                   	pop    %esi
-  popl %ebx
 8010496d:	5b                   	pop    %ebx
-  popl %ebp
 8010496e:	5d                   	pop    %ebp
-  ret
 8010496f:	c3                   	ret
 
 80104970 <fetchint>:
@@ -11460,56 +11411,25 @@ sys_chpr(void)
 80105966:	c3                   	ret
 
 80105967 <alltraps>:
-
-  # vectors.S sends all traps here.
-.globl alltraps
-alltraps:
-  # Build trap frame.
-  pushl %ds
 80105967:	1e                   	push   %ds
-  pushl %es
 80105968:	06                   	push   %es
-  pushl %fs
 80105969:	0f a0                	push   %fs
-  pushl %gs
 8010596b:	0f a8                	push   %gs
-  pushal
 8010596d:	60                   	pusha
-  
-  # Set up data segments.
-  movw $(SEG_KDATA<<3), %ax
 8010596e:	66 b8 10 00          	mov    $0x10,%ax
-  movw %ax, %ds
 80105972:	8e d8                	mov    %eax,%ds
-  movw %ax, %es
 80105974:	8e c0                	mov    %eax,%es
-
-  # Call trap(tf), where tf=%esp
-  pushl %esp
 80105976:	54                   	push   %esp
-  call trap
 80105977:	e8 c4 00 00 00       	call   80105a40 <trap>
-  addl $4, %esp
 8010597c:	83 c4 04             	add    $0x4,%esp
 
 8010597f <trapret>:
-
-  # Return falls through to trapret...
-.globl trapret
-trapret:
-  popal
 8010597f:	61                   	popa
-  popl %gs
 80105980:	0f a9                	pop    %gs
-  popl %fs
 80105982:	0f a1                	pop    %fs
-  popl %es
 80105984:	07                   	pop    %es
-  popl %ds
 80105985:	1f                   	pop    %ds
-  addl $0x8, %esp  # trapno and errcode
 80105986:	83 c4 08             	add    $0x8,%esp
-  iret
 80105989:	cf                   	iret
 8010598a:	66 90                	xchg   %ax,%ax
 8010598c:	66 90                	xchg   %ax,%ax

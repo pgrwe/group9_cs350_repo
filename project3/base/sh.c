@@ -60,7 +60,7 @@ runcmd(struct cmd *cmd)
   //int p[2];
   //struct backcmd *bcmd;
   struct execcmd *ecmd;
-  //struct listcmd *lcmd;
+  struct listcmd *lcmd;
   //struct pipecmd *pcmd;
   //struct redircmd *rcmd;
   
@@ -84,7 +84,26 @@ runcmd(struct cmd *cmd)
     break;
 
   case LIST:
-    printf(2, "List Not Implemented\n");
+    lcmd = (struct listcmd*)cmd; //Cast the cmd pointer to represent the list type
+    if(lcmd->left)
+    {
+      if(fork1() == 0)
+      {
+        runcmd(lcmd->left);
+        exit();
+      }
+      wait();
+    }
+    if(lcmd->right)
+    {
+      if(fork1() == 0)
+      {
+        runcmd(lcmd->right);
+        exit();
+      }
+      wait();
+    }
+    //printf(2, "List Not Implemented\n");
     break;
 
   case PIPE:
