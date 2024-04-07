@@ -13,6 +13,15 @@
 
 #define MAXARGS 10
 
+// MAX 10 commands in history
+#define MAX_HISTORY 10
+
+// 100 because of buffer size
+char history[MAX_HISTORY][100];
+
+
+int total_cmds = 0;
+
 struct cmd {
   int type;
 };
@@ -53,6 +62,11 @@ int fork1(void);  // Fork but panics on failure.
 void panic(char*);
 struct cmd *parsecmd(char*);
 
+int check_history(char *cmd);
+void add_history(const char *cmd);
+void print_history();
+void execute_history(int n);
+
 // Execute cmd.  Never returns.
 void
 runcmd(struct cmd *cmd)
@@ -75,6 +89,18 @@ runcmd(struct cmd *cmd)
     ecmd = (struct execcmd*)cmd;
     if(ecmd->argv[0] == 0)
       exit();
+
+    if(strcmp(ecmd->argv[0], "hist") == 0) {
+      if (ecmd->argv[1] && strcmp(ecmd->argv[1], "print") == 0) {
+        print_history();
+      } else if (ecmd->argv[1] && atoi(ecmd->argv[1]) != 0) {
+        execute_history(atoi(ecmd->argv[1]));
+      } else if (ecmd->argv[1] && strcmp(ecmd->argv[1], "0") == 0) {
+        execute_history(0);
+      }
+      break;
+    }
+
     exec(ecmd->argv[0], ecmd->argv);
     printf(2, "exec %s failed\n", ecmd->argv[0]);
     break;
@@ -169,6 +195,9 @@ main(void)
 
   // Read and run input commands.
   while(getcmd(buf, sizeof(buf)) >= 0){
+    // add command to history
+    add_history(buf);
+
     if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
       // Chdir must be called by the parent, not the child.
       buf[strlen(buf)-1] = 0;  // chop \n
@@ -176,8 +205,11 @@ main(void)
         printf(2, "cannot cd %s\n", buf+3);
       continue;
     }
-    if(fork1() == 0)
+
+
+    if(fork1() == 0) {
       runcmd(parsecmd(buf));
+    }
     wait();
   }
   exit();
@@ -502,4 +534,40 @@ nulterminate(struct cmd *cmd)
     break;
   }
   return cmd;
+}
+
+int check_history(char *cmd) {
+  if (cmd[0] == 'h' && cmd[1] == 'i' && cmd[2] == 's' && cmd[3] == 't' && cmd[4] == ' ') {
+    return 1;
+  }
+  return 0;
+}
+
+void add_history(const char *cmd) {
+  // ignore history commands
+  if (check_history(cmd)) return;
+
+  for (int i = total_cmds; i > 0; i--) {
+    strcpy(history[i], history[i - 1]);
+  }
+  strcpy(history[0], cmd);
+  if (total_cmds < MAX_HISTORY - 1) total_cmds++;
+}
+
+void print_history() {
+    for(int n = 0; n < total_cmds; n++) {
+        printf(2, "Previous command %d: %s", n + 1, history[n]);
+    }
+}
+
+void execute_history(int n) {
+    if(n > 0 && n <= total_cmds) {
+        if(fork1() == 0) {
+          runcmd(parsecmd(history[n - 1]));
+          exit();
+        }
+        wait();
+    } else {
+        printf(2, "No such command in history.");
+    }
 }
