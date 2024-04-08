@@ -21,6 +21,8 @@ char history[MAX_HISTORY][100];
 
 
 int total_cmds = 0;
+int background_pid = -1;
+
 
 struct cmd {
   int type;
@@ -106,7 +108,7 @@ runcmd(struct cmd *cmd)
     printf(2, "exec %s failed\n", ecmd->argv[0]);
     break;
 
-  case REDIR:
+case REDIR:
     rcmd = (struct redircmd*)cmd;
 
     //int new_fd;
@@ -122,7 +124,7 @@ runcmd(struct cmd *cmd)
     }
     else if ((rcmd->mode & O_WRONLY) != 0){
         //close(rcmd->fd);
-        fd = open(rcmd->file, rcmd->mode | O_RDWR);  // Open the file for writing, and create it if it doesn't exist.
+        fd = open(rcmd->file, rcmd->mode );  // Open the file for writing, and create it if it doesn't exist.
         if (fd < 0){
             printf(2, "open %s failed\n", rcmd->file);
             exit();
@@ -205,6 +207,9 @@ runcmd(struct cmd *cmd)
         runcmd(bcmd->cmd); 
         exit();
     }
+      else {
+    background_pid = proc;
+  }
     break;
   }
   exit();
@@ -253,26 +258,16 @@ main(void)
       continue;
     }
 
-    int is_background = buf[strlen(buf) - 1] == '&';
-    if(is_background) {
-      // Remove the '&' character to clean the command if it's meant to run in the background
-      buf[strlen(buf) - 1] = 0;
-    }
 
-    int pid = fork1();
-    if(pid == 0) { // Child process
+    if (fork1() == 0) {
       runcmd(parsecmd(buf));
-    } else { // Parent process
-      if(!is_background) {
-        wait();
-      } else {
-        background_pid = pid;
-      }
-    }
-
-    if(background_pid > 0) {
+    } 
+    else {
+      wait();
+      if (background_pid > 0) {
         waitpid(background_pid, &status, 0);
-        background_pid = -1; // Reset background_pid after waiting
+        background_pid = -1;
+      }
     }
   }
   exit();
