@@ -71,12 +71,13 @@ void execute_history(int n);
 void
 runcmd(struct cmd *cmd)
 {
-  int p[2];
-  //struct backcmd *bcmd;
+  int p[2]; // for pipe
+        int fd; // for redirects
+  struct backcmd *bcmd;
   struct execcmd *ecmd;
   struct listcmd *lcmd;
   struct pipecmd *pcmd;
-  //struct redircmd *rcmd;
+  struct redircmd *rcmd;
   
   if(cmd == 0)
     exit();
@@ -106,7 +107,33 @@ runcmd(struct cmd *cmd)
     break;
 
   case REDIR:
-    printf(2, "Redirection Not Implemented\n");
+    rcmd = (struct redircmd*)cmd;
+
+    if (rcmd->mode == O_RDONLY){
+        close(rcmd->fd);
+        fd = open(rcmd->file, rcmd->mode);
+        if (fd < 0){
+            printf(2, "open %s failed\n", rcmd->file);
+        }
+        if (fd != rcmd->fd) { 
+            printf(2, "unexpected file descriptor %d\n", fd);
+            exit();
+        }
+    }
+    else if (rcmd->mode & O_WRONLY != 0){
+        close(rcmd->fd);
+        fd = open(rcmd->efile, rcmd->mode);  
+        if (fd < 0){
+            printf(2, "open %s failed\n", rcmd->file);
+        }
+        if (fd != rcmd->fd) { 
+            printf(2, "unexpected file descriptor %d\n", fd);
+            exit();
+        }
+    }
+
+    runcmd(rcmd->cmd);
+
     break;
 
   case LIST:
@@ -133,8 +160,8 @@ runcmd(struct cmd *cmd)
     break;
 
   case PIPE:
-    pcmd = (struct pcmd*)cmd;
-     if (pipe(p) < 0)
+    pcmd = (struct pipecmd*)cmd;
+    if (pipe(p) < 0)
         panic("pipe");
 
     if (fork1() == 0) { // First command
@@ -162,7 +189,12 @@ runcmd(struct cmd *cmd)
     break;
 
   case BACK:
-    printf(2, "Backgrounding not implemented\n");
+    bcmd = (struct backcmd*)cmd; 
+    int proc = fork1();
+    if(proc == 0) { // backgrounded child
+        runcmd(bcmd->cmd); 
+        exit();
+    }
     break;
   }
   exit();
@@ -513,7 +545,6 @@ nulterminate(struct cmd *cmd)
   case REDIR:
     rcmd = (struct redircmd*)cmd;
     nulterminate(rcmd->cmd);
-    *rcmd->efile = 0;
     break;
 
   case PIPE:
@@ -564,7 +595,6 @@ void execute_history(int n) {
     if(n > 0 && n <= total_cmds) {
         if(fork1() == 0) {
           runcmd(parsecmd(history[n - 1]));
-          exit();
         }
         wait();
     } else {
