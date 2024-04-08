@@ -578,3 +578,42 @@ chpr(int pid, int priority)
 	release(&ptable.lock);
 	return pid;
 }
+
+int
+waitpid(int pid, int *status, int options)
+{
+  struct proc *p;
+  struct proc *curproc = myproc();
+  int havekids, pidFound;
+  
+  acquire(&ptable.lock);
+  for(;;){
+    // Scan through table looking for exited children.
+    havekids = 0;
+    pidFound = 0;
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->parent != curproc)
+        continue;
+      havekids = 1;
+      if(p->pid == pid)
+        pidFound = 1;
+      if(p->state == ZOMBIE && pidFound){
+        // Found the specified PID.
+        if(status)
+          *status = p->exitStatus;
+        p->state = UNUSED;
+        release(&ptable.lock);
+        return pid;
+      }
+    }
+
+    // No point waiting if we don't have any children.
+    if(!havekids || (options & WNOHANG && !pidFound)){
+      release(&ptable.lock);
+      return -1;
+    }
+
+    // Wait for children to exit. (Continue outer loop)
+    sleep(curproc, &ptable.lock);  //DOC: wait-sleep
+  }
+}

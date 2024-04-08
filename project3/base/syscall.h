@@ -23,3 +23,4 @@
 #define SYS_shutdown     22
 #define SYS_cps  23
 #define SYS_chpr  24
+#define SYS_waitpid  25

@@ -13,6 +13,9 @@ struct cpu {
 extern struct cpu cpus[NCPU];
 extern int ncpu;
 
+#define WNOHANG 1
+
+
 //PAGEBREAK: 17
 // Saved registers for kernel context switches.
 // Don't need to save all the segment registers (%cs, etc),
@@ -51,6 +54,7 @@ struct proc {
   char name[16];               // Process name (debugging)
 
   int priority;
+  int exitStatus;
 };
 
 // Process memory is laid out contiguously, low addresses first:

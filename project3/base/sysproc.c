@@ -117,4 +117,17 @@ sys_chpr(void)
   return chpr(pid, pr);
 }
 
+int
+sys_waitpid(void)
+{
+  int pid;
+  int* status;
+  int options;
+
+  // Assuming argint and argptr are helper functions to get arguments from the user space
+  if(argint(0, &pid) < 0  || argptr(1, (void*)&status, sizeof(status)) < 0  || argint(2, &options) < 0)
+    return -1;
+
+  return waitpid(pid, status, options); // This calls your actual kernel implementation
+}
 

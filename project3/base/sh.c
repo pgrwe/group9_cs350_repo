@@ -122,7 +122,7 @@ runcmd(struct cmd *cmd)
     }
     else if ((rcmd->mode & O_WRONLY) != 0){
         //close(rcmd->fd);
-        fd = open(rcmd->file, rcmd->mode);  // Open the file for writing, and create it if it doesn't exist.
+        fd = open(rcmd->file, rcmd->mode | O_RDWR);  // Open the file for writing, and create it if it doesn't exist.
         if (fd < 0){
             printf(2, "open %s failed\n", rcmd->file);
             exit();
@@ -226,6 +226,7 @@ main(void)
 {
   static char buf[100];
   int fd;
+  int status; 
 
   // Ensure that three file descriptors are open.
   while((fd = open("console", O_RDWR)) >= 0){
@@ -235,27 +236,48 @@ main(void)
     }
   }
 
+  int background_pid = -1;
+
   // Read and run input commands.
   while(getcmd(buf, sizeof(buf)) >= 0){
+    // Remove newline character from the end of the command
+    buf[strlen(buf)-1] = 0;
+
     // add command to history
     add_history(buf);
 
     if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
       // Chdir must be called by the parent, not the child.
-      buf[strlen(buf)-1] = 0;  // chop \n
       if(chdir(buf+3) < 0)
         printf(2, "cannot cd %s\n", buf+3);
       continue;
     }
 
-
-    if(fork1() == 0) {
-      runcmd(parsecmd(buf));
+    int is_background = buf[strlen(buf) - 1] == '&';
+    if(is_background) {
+      // Remove the '&' character to clean the command if it's meant to run in the background
+      buf[strlen(buf) - 1] = 0;
     }
-    wait();
+
+    int pid = fork1();
+    if(pid == 0) { // Child process
+      runcmd(parsecmd(buf));
+    } else { // Parent process
+      if(!is_background) {
+        wait();
+      } else {
+        background_pid = pid;
+      }
+    }
+
+    if(background_pid > 0) {
+        waitpid(background_pid, &status, 0);
+        background_pid = -1; // Reset background_pid after waiting
+    }
   }
   exit();
 }
+
 
 void
 panic(char *s)
@@ -597,7 +619,7 @@ void add_history(const char *cmd) {
 
 void print_history() {
     for(int n = 0; n < total_cmds; n++) {
-        printf(2, "Previous command %d: %s", n + 1, history[n]);
+        printf(2, "Previous command %d: %s\n", n + 1, history[n]);
     }
 }
 
