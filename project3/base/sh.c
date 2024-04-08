@@ -109,27 +109,37 @@ runcmd(struct cmd *cmd)
   case REDIR:
     rcmd = (struct redircmd*)cmd;
 
+    //int new_fd;
+
     if (rcmd->mode == O_RDONLY){
-        close(rcmd->fd);
+        //close(rcmd->fd);
         fd = open(rcmd->file, rcmd->mode);
-        if (fd < 0){
+        if (fd < 0)
+        {
             printf(2, "open %s failed\n", rcmd->file);
-        }
-        if (fd != rcmd->fd) { 
-            printf(2, "unexpected file descriptor %d\n", fd);
             exit();
         }
     }
-    else if (rcmd->mode & O_WRONLY != 0){
-        close(rcmd->fd);
-        fd = open(rcmd->efile, rcmd->mode);  
+    else if ((rcmd->mode & O_WRONLY) != 0){
+        //close(rcmd->fd);
+        fd = open(rcmd->file, rcmd->mode);  // Open the file for writing, and create it if it doesn't exist.
         if (fd < 0){
             printf(2, "open %s failed\n", rcmd->file);
-        }
-        if (fd != rcmd->fd) { 
-            printf(2, "unexpected file descriptor %d\n", fd);
             exit();
         }
+    }
+
+    if(fd != rcmd->fd) // Check if the file descriptor returned by open is not what we expect
+    {
+      close(rcmd->fd);
+      int new_fd = dup(fd); // Use dup to duplicate it to the right file descriptor number
+
+      if(new_fd != rcmd-> fd)
+      {
+        printf(2, "dup %s failed\n", rcmd->file);
+        exit();
+      }
+      close(fd);
     }
 
     runcmd(rcmd->cmd);
