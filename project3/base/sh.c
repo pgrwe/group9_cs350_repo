@@ -572,6 +572,7 @@ nulterminate(struct cmd *cmd)
   case REDIR:
     rcmd = (struct redircmd*)cmd;
     nulterminate(rcmd->cmd);
+    *rcmd->efile = 0;
     break;
 
   case PIPE:
@@ -622,6 +623,7 @@ void execute_history(int n) {
     if(n > 0 && n <= total_cmds) {
         if(fork1() == 0) {
           runcmd(parsecmd(history[n - 1]));
+          exit();
         }
         wait();
     } else {
